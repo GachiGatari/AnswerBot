@@ -3,7 +3,7 @@ import json
 import logging
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CallbackContext, CommandHandler, CallbackQueryHandler
+from telegram.ext import Updater, CallbackContext, MessageHandler, CallbackQueryHandler,Filters
 
 from KeyBoardobject import MainButton, ChildButton,MainKeyBoard
 
@@ -56,7 +56,7 @@ def main_button(callback) ->InlineKeyboardMarkup:
 def main() -> None:
     updater = Updater(token)
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(CommandHandler('help', help_send))
+    dispatcher.add_handler(MessageHandler(Filters.text,help_send))
     dispatcher.add_handler(CallbackQueryHandler(button))
 
     updater.start_polling()
