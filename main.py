@@ -15,11 +15,7 @@ config = configparser.ConfigParser()
 config.read("settings.ini")
 token = config["Telegram"]["token"]
 
-
-
-
-def help_send(update: Update, _: CallbackContext) -> None:
-    keyboard = [
+keyboard = [
         [
             InlineKeyboardButton(MainKeyBoard['counters'].text, callback_data=MainKeyBoard['counters'].callback),
             InlineKeyboardButton(MainKeyBoard['registration'].text, callback_data=MainKeyBoard['registration'].callback)
@@ -27,8 +23,12 @@ def help_send(update: Update, _: CallbackContext) -> None:
         [
             InlineKeyboardButton(MainKeyBoard['pay'].text, callback_data=MainKeyBoard['pay'].callback),
             InlineKeyboardButton(MainKeyBoard['other'].text, callback_data=MainKeyBoard['other'].callback)
-        ]
+        ],
     ]
+
+
+def help_send(update: Update, _: CallbackContext) -> None:
+    global keyboard
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text("Выберите один из вариантов:", reply_markup=reply_markup)
 
@@ -36,7 +36,10 @@ def help_send(update: Update, _: CallbackContext) -> None:
 def button(update: Update, _: CallbackContext) -> None:
     query = update.callback_query
     query.answer()
-    if query.data in MainKeyBoard.keys():
+    if query.data == "back":
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        query.edit_message_text(text="Выберите один из вариантов:",reply_markup=reply_markup)
+    elif query.data in MainKeyBoard.keys():
         query.edit_message_text(text="Выберите один из вариантов:", reply_markup=main_button(query.data))
     else:
         with open('answer.json', 'r', encoding='utf-8') as f:
@@ -49,6 +52,7 @@ def main_button(callback) ->InlineKeyboardMarkup:
     keyboard = []
     for button in MainKeyBoard[callback].childs:
         keyboard.append([InlineKeyboardButton(button.text, callback_data=button.callback)])
+    keyboard.append([InlineKeyboardButton("⬅",callback_data="back")])
     reply_markup = InlineKeyboardMarkup(keyboard)
     return reply_markup
 
